@@ -1,0 +1,139 @@
+Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
+----------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2019.2 (win64) Build 2708876 Wed Nov  6 21:40:23 MST 2019
+| Date         : Sun Nov  3 12:29:45 2024
+| Host         : DESKTOP-OFO9OC1 running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file thinpad_top_control_sets_placed.rpt
+| Design       : thinpad_top
+| Device       : xc7a100t
+----------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Total control sets                                       |    61 |
+|    Minimum number of control sets                        |    61 |
+|    Addition due to synthesis replication                 |     0 |
+|    Addition due to physical synthesis replication        |     0 |
+| Unused register locations in slices containing registers |    57 |
++----------------------------------------------------------+-------+
+* Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
+** Run report_qor_suggestions for automated merging and remapping suggestions
+
+
+2. Histogram
+------------
+
++--------------------+-------+
+|       Fanout       | Count |
++--------------------+-------+
+| Total control sets |    61 |
+| >= 0 to < 4        |     2 |
+| >= 4 to < 6        |     1 |
+| >= 6 to < 8        |     2 |
+| >= 8 to < 10       |     3 |
+| >= 10 to < 12      |     2 |
+| >= 12 to < 14      |     0 |
+| >= 14 to < 16      |     0 |
+| >= 16              |    51 |
++--------------------+-------+
+* Control sets can be remapped at either synth_design or opt_design
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |              32 |           10 |
+| No           | No                    | Yes                    |              24 |           12 |
+| No           | Yes                   | No                     |              16 |            5 |
+| Yes          | No                    | No                     |             151 |           31 |
+| Yes          | No                    | Yes                    |            1436 |          538 |
+| Yes          | Yes                   | No                     |              12 |            4 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++--------------------------+-------------------------------------------------------------------------+----------------------------------------------------------------------+------------------+----------------+
+|       Clock Signal       |                              Enable Signal                              |                           Set/Reset Signal                           | Slice Load Count | Bel Load Count |
++--------------------------+-------------------------------------------------------------------------+----------------------------------------------------------------------+------------------+----------------+
+|  clock_gen/inst/clk_out1 |                                                                         | reset_of_clk10M_i_1_n_0                                              |                1 |              1 |
+|  clock_gen/inst/clk_out1 | uart_controller/u_async_receiver/tickgen/OversamplingTick               |                                                                      |                1 |              1 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_waddr[4]_i_1_n_0                                   | reset_of_clk10M                                                      |                2 |              5 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/wb_adr_o_reg[0]_5                                     | u_wishbone_master/wb_sel_o_reg[1]_0                                  |                2 |              6 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/wb_adr_o_reg[0]_4                                     | u_wishbone_master/wb_sel_o_reg[3]_0                                  |                2 |              6 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/E[0]                                                  |                                                                      |                1 |              8 |
+|  clock_gen/inst/clk_out1 | uart_controller/u_async_receiver/tickgen/FSM_onehot_RxD_state_reg[3][0] |                                                                      |                2 |              8 |
+|  clock_gen/inst/clk_out1 | uart_controller/u_async_transmitter/tickgen/Acc_reg[15]_0[0]            |                                                                      |                2 |              8 |
+|  clock_gen/inst/clk_out1 | uart_controller/u_async_transmitter/tickgen/E[0]                        |                                                                      |                2 |             11 |
+|  clock_gen/inst/clk_out1 | uart_controller/u_async_receiver/tickgen/E[0]                           |                                                                      |                2 |             11 |
+|  clock_gen/inst/clk_out1 |                                                                         | uart_controller/u_async_transmitter/FSM_onehot_TxD_state_reg_n_0_[0] |                5 |             16 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_raddr_a[4]_i_1_n_0                                 | reset_of_clk10M                                                      |                8 |             18 |
+|  clock_gen/inst/clk_out1 | sram_controller_base/sram_addr[19]_i_1__0_n_0                           |                                                                      |                4 |             20 |
+|  clock_gen/inst/clk_out1 | sram_controller_ext/sram_addr[19]_i_1_n_0                               |                                                                      |                3 |             20 |
+|  clock_gen/inst/clk_out1 |                                                                         | reset_of_clk10M                                                      |               11 |             23 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_2[0]                                        | reset_of_clk10M                                                      |               10 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_30[0]                                       | reset_of_clk10M                                                      |               12 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_4[0]                                        | reset_of_clk10M                                                      |               10 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_3[0]                                        | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_1[0]                                        | reset_of_clk10M                                                      |               21 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_24[0]                                       | reset_of_clk10M                                                      |               20 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_25[0]                                       | reset_of_clk10M                                                      |               15 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_12[0]                                       | reset_of_clk10M                                                      |               13 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_18[0]                                       | reset_of_clk10M                                                      |               11 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_22[0]                                       | reset_of_clk10M                                                      |               16 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_28[0]                                       | reset_of_clk10M                                                      |               11 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_5[0]                                        | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_9[0]                                        | reset_of_clk10M                                                      |               20 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_8[0]                                        | reset_of_clk10M                                                      |               21 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_19[0]                                       | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/wb_dat_o[31]_i_1_n_0                                  | reset_of_clk10M                                                      |                6 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_26[0]                                       | reset_of_clk10M                                                      |               13 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_23[0]                                       | reset_of_clk10M                                                      |               17 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_0[0]                                        | reset_of_clk10M                                                      |               19 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_11[0]                                       | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_7[0]                                        | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_10[0]                                       | reset_of_clk10M                                                      |               13 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_15[0]                                       | reset_of_clk10M                                                      |               11 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_20[0]                                       | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_17[0]                                       | reset_of_clk10M                                                      |               11 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_21[0]                                       | reset_of_clk10M                                                      |               11 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_29[0]                                       | reset_of_clk10M                                                      |               13 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_27[0]                                       | reset_of_clk10M                                                      |                8 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/inst                                                  | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/mem_data                                              | reset_of_clk10M                                                      |                5 |             32 |
+|  clock_gen/inst/clk_out1 |                                                                         |                                                                      |               10 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/pc                                                    | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/pc_jump                                               | reset_of_clk10M                                                      |                8 |             32 |
+|  clock_gen/inst/clk_out1 | sram_controller_base/sram_data_o_reg                                    | reset_of_clk10M                                                      |                8 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rd_data                                               | reset_of_clk10M                                                      |                7 |             32 |
+|  clock_gen/inst/clk_out1 | sram_controller_base/wb_dat_o[31]_i_1__1_n_0                            |                                                                      |                8 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_wdata[31]_i_1_n_0                                  | reset_of_clk10M                                                      |               19 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_16[0]                                       | reset_of_clk10M                                                      |               16 |             32 |
+|  clock_gen/inst/clk_out1 | sram_controller_ext/sram_data_o_reg                                     | reset_of_clk10M                                                      |                9 |             32 |
+|  clock_gen/inst/clk_out1 | sram_controller_ext/wb_dat_o[31]_i_1__2_n_0                             |                                                                      |                6 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/wb_adr_o[31]_i_1_n_0                                  | reset_of_clk10M                                                      |                7 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_14[0]                                       | reset_of_clk10M                                                      |               14 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_6[0]                                        | reset_of_clk10M                                                      |               11 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/rf_we_reg_13[0]                                       | reset_of_clk10M                                                      |               10 |             32 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/mem_w                                                 | reset_of_clk10M                                                      |                9 |             33 |
+|  clock_gen/inst/clk_out1 | u_wishbone_master/alu_a[31]_i_1_n_0                                     | reset_of_clk10M                                                      |               31 |             68 |
++--------------------------+-------------------------------------------------------------------------+----------------------------------------------------------------------+------------------+----------------+
+
+

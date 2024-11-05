@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Webtalk v2019.2 (64-bit)
+# SW Build 2708876 on Wed Nov  6 21:40:23 MST 2019
+# IP Build 2700528 on Thu Nov  7 00:09:20 MST 2019
+# Start of session at: Sun Nov  3 22:37:24 2024
+# Process ID: 3220
+# Current directory: D:/Xilinx/projects/cod24/cod24-luyi22/thinpad_top.sim/sim_1/behav/xsim
+# Command line: wbtcv.exe -mode batch -source D:/Xilinx/projects/cod24/cod24-luyi22/thinpad_top.sim/sim_1/behav/xsim/xsim.dir/tb_behav/webtalk/xsim_webtalk.tcl -notrace
+# Log file: D:/Xilinx/projects/cod24/cod24-luyi22/thinpad_top.sim/sim_1/behav/xsim/webtalk.log
+# Journal file: D:/Xilinx/projects/cod24/cod24-luyi22/thinpad_top.sim/sim_1/behav/xsim\webtalk.jou
+#-----------------------------------------------------------
+source D:/Xilinx/projects/cod24/cod24-luyi22/thinpad_top.sim/sim_1/behav/xsim/xsim.dir/tb_behav/webtalk/xsim_webtalk.tcl -notrace
+INFO: [Common 17-206] Exiting Webtalk at Sun Nov  3 22:37:25 2024...
