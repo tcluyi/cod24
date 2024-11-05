@@ -1,6 +1,6 @@
 `default_nettype none
 
-module thinpad_top (
+module thinpad_top_pipeline (
     input wire clk_50M,     // 50MHz 时钟输入
     input wire clk_11M0592, // 11.0592MHz 时钟输入（备用，可不用）
 
@@ -83,7 +83,6 @@ module thinpad_top (
     output wire [31:0] pc,
     output wire [31:0] pc2,
     output wire pipestall,
-    output wire [1:0] stall_i,
     output wire jump,
     output wire [31:0] rs1_data,
     output wire [31:0] rs2_data,
@@ -277,13 +276,14 @@ module thinpad_top (
       .clk_i(sys_clk),
       .rst_i(sys_rst),
 
-      .pc_i(pc_if_i),
       .pc_target(pc_target),
       .jump_en(jump_en),
       .pc_o(pc_if_o),
       .inst_o(inst_if_o),
 
       .stall_i(stall_if_i),
+      .flush_o(flush_if_o),
+      .stall_o(stall_if_o),
       
       // wishbone master
       .wb_cyc_o(wbm0_cyc_o),
@@ -311,19 +311,16 @@ module thinpad_top (
       .inst_o(inst_id_i),
 
       .stall_i(stall_if_i),
-      .bubble_i(bubble_if_i),
-      .flush_o(flush_if_o),
-      .stall_o(stall_if_o)
+      .bubble_i(bubble_if_i)
   );
 
   // =========== ID begin =========== 
   logic [31:0] pc_id_o;
   logic [31:0] inst_id_o;
   logic [31:0] imm_id_o;
-  logic [4:0] rf_waddr_id_i, rf_waddr_id_o;
+  logic [4:0] rf_waddr_id_i, rf_waddr_id_o, rf_raddr_a_id_o, rf_raddr_b_id_o;
   logic rf_we_id_i;
   logic [31:0] rf_wdata_id_i, rf_rdata_a_id_o, rf_rdata_b_id_o;
-
   logic [4:0] rf_waddr_exe_i, rf_waddr_mem_i, rf_waddr_wb_i;
 
   ID u_id(
@@ -332,10 +329,6 @@ module thinpad_top (
 
       .pc_i(pc_id_i),
       .inst_i(inst_id_i),
-      .rf_waddr_i(rf_waddr_id_i),
-      .rf_wdata_i(rf_wdata_id_i),
-      .rf_we_i(rf_we_id_i),
-
       .rf_waddr_exe_i(rf_waddr_exe_i),
       .rf_waddr_mem_i(rf_waddr_mem_i),
       .rf_waddr_wb_i(rf_waddr_wb_i),
@@ -343,11 +336,24 @@ module thinpad_top (
       .pc_o(pc_id_o),
       .inst_o(inst_id_o),
       .imm_o(imm_id_o),
-      .rf_rdata_a_o(rf_rdata_a_id_o),
-      .rf_rdata_b_o(rf_rdata_b_id_o),
+      .rf_raddr_a_o(rf_raddr_a_id_o),
+      .rf_raddr_b_o(rf_raddr_b_id_o),
       .rf_waddr_o(rf_waddr_id_o),
-
-      .stall_time(stall_time)
+      
+      .flush_o(flush_id_o),
+      .stall_o(stall_id_o)
+  );
+  
+  RegFile u_regfile (
+      .clk(sys_clk),
+      .reset(sys_rst),
+      .rf_raddr_a(rf_raddr_a_id_o),
+      .rf_rdata_a(rf_rdata_a_id_o),
+      .rf_raddr_b(rf_raddr_b_id_o),
+      .rf_rdata_b(rf_rdata_b_id_o),
+      .rf_waddr(rf_waddr_id_i),
+      .rf_wdata(rf_wdata_id_i),
+      .rf_we(rf_we_id_i)
   );
   // =========== ID end =========== 
 
@@ -367,7 +373,6 @@ module thinpad_top (
       .rf_rdata_a_i(rf_rdata_a_id_o),
       .rf_rdata_b_i(rf_rdata_b_id_o),
       .rf_waddr_i(rf_waddr_id_o),
-      .stall_time(stall_time),
 
       .pc_o(pc_exe_i),
       .inst_o(inst_exe_i),
@@ -377,19 +382,21 @@ module thinpad_top (
       .rf_waddr_o(rf_waddr_exe_i),
 
       .stall_i(stall_id_i),
-      .bubble_i(bubble_id_i),
-      .flush_o(flush_id_o),
-      .stall_o(stall_id_o)
+      .bubble_i(bubble_id_i)
   );
 
   // =========== EXE begin =========== 
   logic [31:0] pc_exe_o;
   logic [31:0] inst_exe_o;
+  logic [31:0] imm_exe_o;
   logic [4:0] rf_waddr_exe_o;
   logic [31:0] rf_wdata_exe_o;
 
   logic [31:0] mem_addr_exe_o, mem_data_exe_o;
   logic mem_w_exe_o, mem_en_exe_o;
+  
+  logic [31:0] alu_a_exe_o, alu_b_exe_o, alu_y_exe_o;
+  logic [3:0] alu_op_exe_o;
   
   EXE u_exe(
       .clk(sys_clk),
@@ -404,24 +411,41 @@ module thinpad_top (
 
       .pc_o(pc_exe_o),
       .inst_o(inst_exe_o),
+      .imm_o(imm_exe_o),
       .rf_waddr_o(rf_waddr_exe_o),
-      .rf_wdata_o(rf_wdata_exe_o),
       .pc_target_o(pc_target),
       .jump_en_o(jump_en),
       .mem_addr_o(mem_addr_exe_o),
       .mem_data_o(mem_data_exe_o),
       .mem_w_o(mem_w_exe_o),
-      .mem_en_o(mem_en_exe_o)
+      .mem_en_o(mem_en_exe_o),
+      
+      .alu_a_o(alu_a_exe_o),
+      .alu_b_o(alu_b_exe_o),
+      .alu_op_o(alu_op_exe_o),
+      
+      .flush_o(flush_exe_o),
+      .stall_o(stall_exe_o)
+  );
+  
+  ALU u_alu(
+      .alu_a(alu_a_exe_o),
+      .alu_b(alu_b_exe_o),
+      .alu_op(alu_op_exe_o),
+      .alu_y(alu_y_exe_o)
   );
   // =========== EXE end =========== 
 
   logic [31:0] pc_mem_i;
   logic [31:0] inst_mem_i;
+  logic [31:0] imm_mem_i;
   //logic [4:0] rf_waddr_mem_i;
   logic [31:0] rf_wdata_mem_i;
 
   logic [31:0] mem_addr_mem_i, mem_data_mem_i;
   logic mem_w_mem_i, mem_en_mem_i;
+  
+  logic [31:0] alu_y_mem_i;
 
   EXE_MEM u_exe_mem(
       .clk(sys_clk),
@@ -429,27 +453,26 @@ module thinpad_top (
 
       .pc_i(pc_exe_o),
       .inst_i(inst_exe_o),
+      .imm_i(imm_exe_o),
       .rf_waddr_i(rf_waddr_exe_o),
-      .rf_wdata_i(rf_wdata_exe_o),
       .mem_addr_i(mem_addr_exe_o),
       .mem_data_i(mem_data_exe_o),
       .mem_w_i(mem_w_exe_o),
       .mem_en_i(mem_en_exe_o),
-      .jump_en_i(jump_en),
+      .alu_y_i(alu_y_exe_o),
 
       .pc_o(pc_mem_i),
       .inst_o(inst_mem_i),
+      .imm_o(imm_mem_i),
       .rf_waddr_o(rf_waddr_mem_i),
-      .rf_wdata_o(rf_wdata_mem_i),
       .mem_addr_o(mem_addr_mem_i),
       .mem_data_o(mem_data_mem_i),
       .mem_w_o(mem_w_mem_i),
       .mem_en_o(mem_en_mem_i),
+      .alu_y_o(alu_y_mem_i),
 
       .stall_i(stall_exe_i),
-      .bubble_i(bubble_exe_i),
-      .flush_o(flush_exe_o),
-      .stall_o(stall_exe_o)
+      .bubble_i(bubble_exe_i)
   );
 
   // =========== MEM_Master begin =========== 
@@ -472,6 +495,8 @@ module thinpad_top (
       .inst_o(inst_mem_o),
 
       .stall_i(stall_mem_i),
+      .flush_o(flush_mem_o),
+      .stall_o(stall_mem_o),
 
       // wishbone master
       .wb_cyc_o(wbm1_cyc_o),
@@ -487,9 +512,11 @@ module thinpad_top (
   
   logic [31:0] pc_wb_i;
   logic [31:0] inst_wb_i;
+  logic [31:0] imm_wb_i;
   //logic [4:0] rf_waddr_wb_i;
   logic [31:0] rf_wdata_wb_i;
   logic [31:0] mem_data_wb_i;
+  logic [31:0] alu_y_wb_i;
 
   MEM_WB u_mem_wb(
       .clk(sys_clk),
@@ -497,20 +524,20 @@ module thinpad_top (
 
       .pc_i(pc_mem_o),
       .inst_i(inst_mem_o),
+      .imm_i(imm_mem_i),
       .rf_waddr_i(rf_waddr_mem_i),
-      .rf_wdata_i(rf_wdata_mem_i),
       .mem_data_i(wbm1_dat_o),
+      .alu_y_i(alu_y_mem_i),
 
       .pc_o(pc_wb_i),
       .inst_o(inst_wb_i),
+      .imm_o(imm_wb_i),
       .rf_waddr_o(rf_waddr_wb_i),
-      .rf_wdata_o(rf_wdata_wb_i),
       .mem_data_o(mem_data_wb_i),
+      .alu_y_o(alu_y_wb_i),
 
       .stall_i(stall_mem_i),
-      .bubble_i(bubble_mem_i),
-      .flush_o(flush_mem_o),
-      .stall_o(stall_mem_o)
+      .bubble_i(bubble_mem_i)
   );
 
   // =========== WB begin =========== 
@@ -520,11 +547,11 @@ module thinpad_top (
 
       .pc_i(pc_wb_i),
       .inst_i(inst_wb_i),
+      .imm_i(imm_wb_i),
       .rf_waddr_i(rf_waddr_wb_i),
-      .rf_wdata_i(rf_wdata_wb_i),
       .mem_data_i(mem_data_wb_i),
+      .alu_y_i(alu_y_wb_i),
 
-      //.pc_o(pc_if_i),
       .rf_waddr_o(rf_waddr_id_i),
       .rf_wdata_o(rf_wdata_id_i),
       .rf_we_o(rf_we_id_i)
@@ -532,15 +559,14 @@ module thinpad_top (
   // =========== WB end =========== 
 
   always_comb begin
-    pc_if_i = pc_id_i;
-    pipeline_stall = wbm0_stb_o || wbm1_stb_o;
-    bubble_if_i = stall_if_o || flush_id_o || flush_exe_o || flush_mem_o;
-    stall_if_i = ((stall_id_o || stall_exe_o || stall_mem_o) && (!bubble_if_i)) || pipeline_stall;
-    bubble_id_i = stall_id_o || flush_exe_o || flush_mem_o;
-    stall_id_i = ((stall_exe_o || stall_mem_o) && (!bubble_id_i)) || pipeline_stall;
-    bubble_exe_i = stall_exe_o || flush_mem_o;
-    stall_exe_i = ((stall_mem_o) && (!bubble_exe_i)) || pipeline_stall;
-    bubble_mem_i = stall_mem_o;
+    pipeline_stall = stall_if_o || stall_mem_o;
+    bubble_if_i = stall_id_o || flush_exe_o;
+    stall_if_i = (!bubble_if_i) && (stall_id_o || pipeline_stall);
+    bubble_id_i = stall_id_o || flush_exe_o;
+    stall_id_i = (!bubble_id_i) && pipeline_stall;
+    bubble_exe_i = 1'b0;
+    stall_exe_i = (!bubble_exe_i) && pipeline_stall;
+    bubble_mem_i = 1'b0;
     stall_mem_i = pipeline_stall;
   end
   
@@ -548,7 +574,6 @@ module thinpad_top (
   assign pc = pc_if_o;
   assign pc2 = pc_id_i;
   assign pipestall = pipeline_stall;
-  assign stall_i = stall_time;
   assign jump = jump_en;
   assign rs1_data = rf_rdata_a_id_o;
   assign rs2_data = rf_rdata_b_id_o;
